@@ -46,7 +46,7 @@ function playTone(freq: number, type: OscillatorType, duration: number, startTim
 export function playRandomRewardSound() {
   initAudio();
 
-  const effectIndex = Math.floor(Math.random() * 4);
+  const effectIndex = Math.floor(Math.random() * 6);
 
   switch(effectIndex) {
     case 0: // Magic Chime
@@ -80,5 +80,77 @@ export function playRandomRewardSound() {
       playTone(400, 'square', 0.1, 0);
       playTone(600, 'square', 0.2, 0.15);
       break;
+    case 4: // Upward Arpeggio
+      playTone(440, 'sine', 0.1, 0); // A4
+      playTone(554.37, 'sine', 0.1, 0.1); // C#5
+      playTone(659.25, 'sine', 0.1, 0.2); // E5
+      playTone(880, 'sine', 0.3, 0.3); // A5
+      break;
+    case 5: // Laser/Pew
+      {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.3);
+      }
+      break;
   }
 }
+
+export function playHugeCelebrationSound() {
+  initAudio();
+  // Fanfare sequence
+  playTone(523.25, 'triangle', 0.2, 0); // C5
+  playTone(659.25, 'triangle', 0.2, 0.1); // E5
+  playTone(783.99, 'triangle', 0.2, 0.2); // G5
+  
+  playTone(659.25, 'triangle', 0.2, 0.4); // E5
+  playTone(783.99, 'triangle', 0.2, 0.5); // G5
+  playTone(1046.5, 'triangle', 0.2, 0.6); // C6
+
+  playTone(783.99, 'square', 0.6, 0.8); // G5
+  playTone(1046.5, 'square', 0.6, 0.8); // C6
+  playTone(1318.5, 'square', 0.6, 0.8); // E6
+}
+
+const ENCOURAGING_PHRASES = [
+  "Good job!",
+  "Awesome!",
+  "Great!",
+  "Well done!",
+  "You are amazing!",
+  "Fantastic!",
+  "Super!",
+  "Excellent!",
+  "Perfect!",
+  "You got it!"
+];
+
+export function playEncouragingVoice() {
+  if (!('speechSynthesis' in window)) return;
+  
+  const phrase = ENCOURAGING_PHRASES[Math.floor(Math.random() * ENCOURAGING_PHRASES.length)];
+  const utterance = new SpeechSynthesisUtterance(phrase);
+  utterance.pitch = 1.2; // A bit higher pitch for kids
+  utterance.rate = 1.1;  // Slightly faster and energetic
+  utterance.volume = 1;
+  
+  // Try to find an English female or cheerful voice
+  const voices = window.speechSynthesis.getVoices();
+  const goodVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')));
+  if (goodVoice) {
+    utterance.voice = goodVoice;
+  }
+
+  window.speechSynthesis.speak(utterance);
+}
+
