@@ -2,12 +2,74 @@
 
 let audioCtx: AudioContext | any = null;
 let unlocked = false;
+let cachedVoices: SpeechSynthesisVoice[] = [];
+
+const PREFERRED_VOICE_PATTERNS = [
+  /Samantha/i,
+  /Ava/i,
+  /Allison/i,
+  /Serena/i,
+  /Karen/i,
+  /Moira/i,
+  /Google US English/i,
+  /Microsoft Aria/i,
+  /Jenny/i,
+  /Nancy/i,
+];
+
+function getSpeechSynthesis() {
+  if (!('speechSynthesis' in window)) return null;
+  return window.speechSynthesis;
+}
+
+function refreshVoices() {
+  const synth = getSpeechSynthesis();
+  if (!synth) return [];
+
+  const voices = synth.getVoices();
+  if (voices.length > 0) {
+    cachedVoices = voices;
+  }
+  return cachedVoices;
+}
+
+function initVoices() {
+  const synth = getSpeechSynthesis();
+  if (!synth) return;
+
+  refreshVoices();
+  synth.onvoiceschanged = () => {
+    refreshVoices();
+  };
+}
+
+function pickBestVoice() {
+  const englishVoices = refreshVoices().filter((voice) => voice.lang.toLowerCase().startsWith('en'));
+  if (englishVoices.length === 0) return null;
+
+  const scoredVoices = englishVoices.map((voice) => {
+    let score = 0;
+
+    if (voice.localService) score += 3;
+    if (voice.default) score += 2;
+    if (voice.lang.toLowerCase().startsWith('en-us')) score += 3;
+    if (PREFERRED_VOICE_PATTERNS.some((pattern) => pattern.test(voice.name))) score += 5;
+    if (/female|woman|zira|aria/i.test(voice.name)) score += 1;
+
+    return { voice, score };
+  });
+
+  scoredVoices.sort((a, b) => b.score - a.score);
+  return scoredVoices[0]?.voice ?? null;
+}
 
 export function initAudio() {
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     audioCtx = new AudioContextClass();
   }
+
+  initVoices();
 
   if (!unlocked) {
     // Play a silent sound to unlock mobile browsers (especially iOS Safari)
@@ -191,22 +253,27 @@ const ENCOURAGING_PHRASES = [
   "Bravo!"
 ];
 
-export function playEncouragingVoice() {
-  if (!('speechSynthesis' in window)) return;
-  
-  const phrase = ENCOURAGING_PHRASES[Math.floor(Math.random() * ENCOURAGING_PHRASES.length)];
-  const utterance = new SpeechSynthesisUtterance(phrase);
-  utterance.pitch = 1.2; // A bit higher pitch for kids
-  utterance.rate = 1.1;  // Slightly faster and energetic
-  utterance.volume = 1;
-  
-  // Try to find an English female or cheerful voice
-  const voices = window.speechSynthesis.getVoices();
-  const goodVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')));
-  if (goodVoice) {
-    utterance.voice = goodVoice;
-  }
-
-  window.speechSynthesis.speak(utterance);
+export function getRandomEncouragingPhrase() {
+  return ENCOURAGING_PHRASES[Math.floor(Math.random() * ENCOURAGING_PHRASES.length)];
 }
 
+export function playEncouragingVoice(phrase: string) {
+  const synth = getSpeechSynthesis();
+  if (!synth) return;
+
+  initVoices();
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(phrase);
+  utterance.lang = 'en-US';
+  utterance.pitch = 1.02;
+  utterance.rate = 0.96;
+  utterance.volume = 0.95;
+
+  const bestVoice = pickBestVoice();
+  if (bestVoice) {
+    utterance.voice = bestVoice;
+    utterance.lang = bestVoice.lang;
+  }
+
+  synth.speak(utterance);
+}

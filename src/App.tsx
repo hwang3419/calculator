@@ -6,9 +6,10 @@ import { NumberPad } from './components/NumberPad';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { RewardEffect } from './components/RewardEffect';
 import { type MathProblem, generateProblem, checkAnswer } from './utils/mathLogic';
-import { playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
+import { getRandomEncouragingPhrase, playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
 
 const AUTO_NEXT_DELAY_MS = 3200;
+const ENCOURAGEMENT_TEXT_DURATION_MS = 2200;
 
 function App() {
   const [difficultyLevel, setDifficultyLevel] = useState<number>(1);
@@ -18,6 +19,7 @@ function App() {
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [streak, setStreak] = useState<number>(0);
   const [isHugeCelebration, setIsHugeCelebration] = useState<boolean>(false);
+  const [encouragementText, setEncouragementText] = useState<string | null>(null);
 
   const initProblem = useCallback(() => {
     setCurrentProblem(generateProblem(difficultyLevel));
@@ -41,6 +43,18 @@ function App() {
     };
   }, [feedback, initProblem]);
 
+  useEffect(() => {
+    if (!encouragementText) return;
+
+    const timer = window.setTimeout(() => {
+      setEncouragementText(null);
+    }, ENCOURAGEMENT_TEXT_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [encouragementText]);
+
   const handleNumberClick = (num: string) => {
     initAudio(); // Unlock audio context on first interaction
     if (feedback) return; // Prevent input while feedback is showing
@@ -61,7 +75,9 @@ function App() {
     
     if (isCorrect) {
       const newStreak = streak + 1;
+      const phrase = getRandomEncouragingPhrase();
       setStreak(newStreak);
+      setEncouragementText(phrase);
       
       if (newStreak > 0 && newStreak % 10 === 0) {
         setIsHugeCelebration(true);
@@ -70,10 +86,11 @@ function App() {
         setIsHugeCelebration(false);
         playRandomRewardSound();
       }
-      playEncouragingVoice();
+      playEncouragingVoice(phrase);
     } else {
       setStreak(0);
       setIsHugeCelebration(false);
+      setEncouragementText(null);
     }
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
@@ -100,6 +117,13 @@ function App() {
   return (
     <div className="min-h-[100dvh] bg-[#f0fdf4] font-sans flex flex-col items-center py-2 md:py-6 px-4 selection:bg-transparent overflow-x-hidden">
       {feedback === 'correct' && <RewardEffect isHuge={isHugeCelebration} />}
+      {encouragementText && (
+        <div className="pointer-events-none absolute inset-x-0 top-24 md:top-28 z-[110] flex justify-center px-4">
+          <div className="animate-encouragement-pop rounded-full border-4 border-yellow-300 bg-gradient-to-r from-yellow-200 via-pink-200 to-cyan-200 px-6 py-3 text-center text-2xl font-extrabold text-orange-700 shadow-[0_16px_40px_rgba(251,191,36,0.45)] md:px-8 md:text-4xl">
+            {encouragementText}
+          </div>
+        </div>
+      )}
       
       <div className="w-full max-w-md landscape:max-w-4xl lg:max-w-4xl flex flex-col relative z-10 flex-grow py-2">
         
