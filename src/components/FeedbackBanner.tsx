@@ -3,11 +3,10 @@ import React from 'react';
 interface FeedbackBannerProps {
   status: 'correct' | 'incorrect' | null;
   correctAnswer?: number;
-  onNext: () => void;
   onRetry: () => void;
 }
 
-export const FeedbackBanner: React.FC<FeedbackBannerProps> = ({ status, correctAnswer, onNext, onRetry }) => {
+export const FeedbackBanner: React.FC<FeedbackBannerProps> = ({ status, correctAnswer, onRetry }) => {
   if (!status) return <div className="h-0 mb-0 opacity-0 overflow-hidden transition-all duration-300" />; 
 
   const isCorrect = status === 'correct';
@@ -26,12 +25,9 @@ export const FeedbackBanner: React.FC<FeedbackBannerProps> = ({ status, correctA
       )}
       
       {isCorrect ? (
-        <button 
-          onClick={onNext}
-          className="bg-green-500 text-white text-lg md:text-xl font-extrabold py-3 md:py-4 px-6 md:px-8 rounded-2xl active:scale-95 shadow-sm border-b-4 border-green-600 active:border-b-0 active:translate-y-1 w-full transition-all"
-        >
-          Next Problem
-        </button>
+        <p className="text-base md:text-lg font-bold text-center">
+          Get ready for the next problem...
+        </p>
       ) : (
         <button 
           onClick={onRetry}

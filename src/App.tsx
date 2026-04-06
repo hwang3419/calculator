@@ -8,6 +8,8 @@ import { RewardEffect } from './components/RewardEffect';
 import { type MathProblem, generateProblem, checkAnswer } from './utils/mathLogic';
 import { playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
 
+const AUTO_NEXT_DELAY_MS = 3200;
+
 function App() {
   const [difficultyLevel, setDifficultyLevel] = useState<number>(1);
   const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
@@ -26,6 +28,18 @@ function App() {
   useEffect(() => {
     initProblem();
   }, [initProblem]);
+
+  useEffect(() => {
+    if (feedback !== 'correct') return;
+
+    const timer = window.setTimeout(() => {
+      initProblem();
+    }, AUTO_NEXT_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [feedback, initProblem]);
 
   const handleNumberClick = (num: string) => {
     initAudio(); // Unlock audio context on first interaction
@@ -116,7 +130,6 @@ function App() {
               <FeedbackBanner 
                 status={feedback} 
                 correctAnswer={getCorrectAnswer()} 
-                onNext={initProblem} 
                 onRetry={initProblem} 
               />
             ) : (
