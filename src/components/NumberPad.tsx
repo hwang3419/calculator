@@ -1,4 +1,5 @@
 import React from 'react';
+import { playNumberClickSound } from '../utils/audio';
 
 interface NumberPadProps {
   onNumberClick: (num: string) => void;
@@ -27,6 +28,7 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onClear, on
             key={btn}
             disabled={disabled}
             onClick={() => {
+              playNumberClickSound();
               if (btn === 'C') onClear();
               else if (btn === '✓') onSubmit();
               else onNumberClick(btn);

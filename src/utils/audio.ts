@@ -43,6 +43,27 @@ function playTone(freq: number, type: OscillatorType, duration: number, startTim
   oscillator.stop(audioCtx.currentTime + startTime + duration);
 }
 
+export function playNumberClickSound() {
+  initAudio();
+  if (!audioCtx) return;
+  
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + 0.05); 
+  
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start(audioCtx.currentTime);
+  osc.stop(audioCtx.currentTime + 0.05);
+}
+
 export function playRandomRewardSound() {
   initAudio();
 
@@ -132,7 +153,42 @@ const ENCOURAGING_PHRASES = [
   "Super!",
   "Excellent!",
   "Perfect!",
-  "You got it!"
+  "You got it!",
+  "Way to go!",
+  "Brilliant!",
+  "You're a star!",
+  "Keep it up!",
+  "Incredible!",
+  "Spectacular!",
+  "Outstanding!",
+  "Bingo!",
+  "Spot on!",
+  "You're on fire!",
+  "Math genius!",
+  "Super duper!",
+  "Nailed it!",
+  "Terrific!",
+  "Magnificent!",
+  "Mind-blowing!",
+  "You're a genius!",
+  "Hooray!",
+  "Yippee!",
+  "Woohoo!",
+  "That's right!",
+  "Exactly!",
+  "Phenomenal!",
+  "Stupendous!",
+  "Marvelous!",
+  "Rock on!",
+  "Unbelievable!",
+  "First class!",
+  "Top notch!",
+  "Out of this world!",
+  "Right on target!",
+  "A plus work!",
+  "You're crushing it!",
+  "Lightning fast!",
+  "Bravo!"
 ];
 
 export function playEncouragingVoice() {

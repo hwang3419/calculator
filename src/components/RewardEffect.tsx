@@ -10,6 +10,7 @@ interface RewardEffectProps {
 
 export const RewardEffect: React.FC<RewardEffectProps> = ({ isHuge }) => {
   const [rewardType, setRewardType] = useState<RewardType>('stars');
+  const [hugeElements, setHugeElements] = useState<{id: number, emoji: string, left: string, top: string, animation: string, delay: string, duration: string, size: string}[]>([]);
 
   useEffect(() => {
     if (isHuge) {
@@ -38,6 +39,27 @@ export const RewardEffect: React.FC<RewardEffectProps> = ({ isHuge }) => {
         }
       };
       frame();
+
+      // Generate random huge elements
+      const elements = Array.from({length: 40}).map((_, i) => {
+        const EMOJIS = ['🏎️', '🚂', '🚀', '⭐', '🎈', '🎉', '🌟', '🦄', '🦖', '🛸', '🚁', '⛴️', '🍎', '🐶', '⚽', '🍕'];
+        const ANIMATIONS = ['animate-fall-random', 'animate-float-up-random', 'animate-zoom-bounce-random'];
+        
+        const selectedAnimation = ANIMATIONS[Math.floor(Math.random() * ANIMATIONS.length)];
+        
+        return {
+          id: i,
+          emoji: EMOJIS[Math.floor(Math.random() * EMOJIS.length)],
+          left: `${Math.random() * 100}%`,
+          top: selectedAnimation === 'animate-zoom-bounce-random' ? `${Math.random() * 100}%` : '0%', // top only matters for zoom-bounce, others use transform
+          animation: selectedAnimation,
+          delay: `${Math.random() * 2}s`,
+          duration: `${2 + Math.random() * 3}s`,
+          size: `${3 + Math.random() * 4}rem`, // 3rem to 7rem
+        };
+      });
+      setHugeElements(elements);
+
     } else {
       const randomType = REWARD_TYPES[Math.floor(Math.random() * REWARD_TYPES.length)];
       setRewardType(randomType);
@@ -46,10 +68,28 @@ export const RewardEffect: React.FC<RewardEffectProps> = ({ isHuge }) => {
 
   if (isHuge) {
     return (
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none flex items-center justify-center z-[100] overflow-hidden">
-        <div className="text-9xl animate-bounce drop-shadow-2xl">
-          🏆🎉🎊
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-[100] overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+          <div className="text-[10rem] md:text-[12rem] animate-bounce drop-shadow-2xl whitespace-nowrap">
+            🏆🎉🎊
+          </div>
         </div>
+        
+        {hugeElements.map(el => (
+          <div 
+            key={el.id} 
+            className={`absolute ${el.animation}`} 
+            style={{
+              left: el.left, 
+              ...(el.animation === 'animate-zoom-bounce-random' ? { top: el.top } : {}),
+              animationDelay: el.delay, 
+              animationDuration: el.duration,
+              fontSize: el.size
+            }}
+          >
+            {el.emoji}
+          </div>
+        ))}
       </div>
     );
   }
