@@ -6,7 +6,7 @@ import { NumberPad } from './components/NumberPad';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { RewardEffect } from './components/RewardEffect';
 import { type MathProblem, generateProblem, checkAnswer } from './utils/mathLogic';
-import { playRandomRewardSound } from './utils/audio';
+import { playRandomRewardSound, initAudio } from './utils/audio';
 
 function App() {
   const [difficultyLevel, setDifficultyLevel] = useState<number>(1);
@@ -26,12 +26,14 @@ function App() {
   }, [initProblem]);
 
   const handleNumberClick = (num: string) => {
+    initAudio(); // Unlock audio context on first interaction
     if (feedback) return; // Prevent input while feedback is showing
     if (userAnswer.length >= 3) return; // Max 3 digits
     setUserAnswer((prev) => prev + num);
   };
 
   const handleClear = () => {
+    initAudio();
     if (feedback) return;
     setUserAnswer('');
   };

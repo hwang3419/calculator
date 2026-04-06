@@ -1,8 +1,32 @@
 // Simple Web Audio API sound synthesizer for reward effects
 
-const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+let audioCtx: AudioContext | any = null;
+let unlocked = false;
+
+export function initAudio() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    audioCtx = new AudioContextClass();
+  }
+
+  if (!unlocked) {
+    // Play a silent sound to unlock mobile browsers (especially iOS Safari)
+    const buffer = audioCtx.createBuffer(1, 1, 22050);
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioCtx.destination);
+    source.start(0);
+
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    unlocked = true;
+  }
+}
 
 function playTone(freq: number, type: OscillatorType, duration: number, startTime: number) {
+  if (!audioCtx) return;
+
   const oscillator = audioCtx.createOscillator();
   const gainNode = audioCtx.createGain();
 
@@ -20,9 +44,7 @@ function playTone(freq: number, type: OscillatorType, duration: number, startTim
 }
 
 export function playRandomRewardSound() {
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
+  initAudio();
 
   const effectIndex = Math.floor(Math.random() * 4);
 
