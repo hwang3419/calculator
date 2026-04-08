@@ -5,14 +5,15 @@ import { AnswerInput } from './components/AnswerInput';
 import { NumberPad } from './components/NumberPad';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { RewardEffect } from './components/RewardEffect';
-import { type MathProblem, generateProblem, checkAnswer } from './utils/mathLogic';
+import { ANSWER_RANGE_OPTIONS, type MathProblem, type ProblemMode, generateProblem, checkAnswer } from './utils/mathLogic';
 import { getRandomEncouragingPhrase, playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
 
 const AUTO_NEXT_DELAY_MS = 3200;
 const ENCOURAGEMENT_TEXT_DURATION_MS = 2200;
 
 function App() {
-  const [difficultyLevel, setDifficultyLevel] = useState<number>(1);
+  const [problemMode, setProblemMode] = useState<ProblemMode>('plus');
+  const [answerRange, setAnswerRange] = useState<number>(10);
   const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
   const [score, setScore] = useState<{ correct: number; total: number }>({ correct: 0, total: 0 });
@@ -22,10 +23,10 @@ function App() {
   const [encouragementText, setEncouragementText] = useState<string | null>(null);
 
   const initProblem = useCallback(() => {
-    setCurrentProblem(generateProblem(difficultyLevel));
+    setCurrentProblem(generateProblem({ mode: problemMode, answerRange }));
     setUserAnswer('');
     setFeedback(null);
-  }, [difficultyLevel]);
+  }, [answerRange, problemMode]);
 
   useEffect(() => {
     initProblem();
@@ -58,7 +59,7 @@ function App() {
   const handleNumberClick = (num: string) => {
     initAudio(); // Unlock audio context on first interaction
     if (feedback) return; // Prevent input while feedback is showing
-    if (userAnswer.length >= 3) return; // Max 3 digits
+    if (userAnswer.length >= String(answerRange).length) return;
     setUserAnswer((prev) => prev + num);
   };
 
@@ -100,9 +101,12 @@ function App() {
     }));
   };
 
-  const handleDifficultyChange = (newLevel: number) => {
-    setDifficultyLevel(newLevel);
-    // When difficulty changes, we generate a new problem at that level
+  const handleProblemModeChange = (newMode: ProblemMode) => {
+    setProblemMode(newMode);
+  };
+
+  const handleAnswerRangeChange = (newRange: number) => {
+    setAnswerRange(newRange);
   };
 
   const getCorrectAnswer = (): number | undefined => {
@@ -138,8 +142,11 @@ function App() {
         <div className="shrink-0 max-w-md mx-auto w-full landscape:max-w-lg lg:max-w-lg">
           <ScoreBoard 
             score={score} 
-            difficultyLevel={difficultyLevel} 
-            onDifficultyChange={handleDifficultyChange} 
+            problemMode={problemMode}
+            answerRange={answerRange}
+            rangeOptions={ANSWER_RANGE_OPTIONS}
+            onProblemModeChange={handleProblemModeChange}
+            onAnswerRangeChange={handleAnswerRangeChange}
           />
         </div>
 

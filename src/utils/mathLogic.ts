@@ -1,4 +1,5 @@
 export type Operator = '+' | '-';
+export type ProblemMode = 'plus' | 'minus' | 'both';
 
 export interface MathProblem {
   a: number;
@@ -6,40 +7,39 @@ export interface MathProblem {
   operator: Operator;
 }
 
-export interface LevelConfig {
-  min: number;
-  max: number;
-  ops: Operator[];
+export interface ProblemSettings {
+  mode: ProblemMode;
+  answerRange: number;
 }
 
-export function getConfigByLevel(level: number): LevelConfig {
-  switch (level) {
-    case 1:
-      return { min: 0, max: 5, ops: ['+'] };
-    case 2:
-      return { min: 0, max: 10, ops: ['+'] };
-    case 3:
-      return { min: 0, max: 10, ops: ['+', '-'] };
-    case 4:
-      return { min: 0, max: 20, ops: ['+', '-'] };
-    case 5:
-      return { min: 0, max: 50, ops: ['+', '-'] };
-    default:
-      return { min: 0, max: 5, ops: ['+'] };
+export const ANSWER_RANGE_OPTIONS = [5, 10, 20, 50, 100] as const;
+
+function getOperatorsForMode(mode: ProblemMode): Operator[] {
+  switch (mode) {
+    case 'plus':
+      return ['+'];
+    case 'minus':
+      return ['-'];
+    case 'both':
+      return ['+', '-'];
   }
 }
 
-export function generateProblem(level: number): MathProblem {
-  const config = getConfigByLevel(level);
-  const operator = config.ops[Math.floor(Math.random() * config.ops.length)];
-  
-  let a = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
-  let b = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
+export function generateProblem(settings: ProblemSettings): MathProblem {
+  const maxAnswer = Math.max(0, settings.answerRange);
+  const operators = getOperatorsForMode(settings.mode);
+  const operator = operators[Math.floor(Math.random() * operators.length)];
 
-  if (operator === '-' && a < b) {
-    [a, b] = [b, a];
+  if (operator === '+') {
+    const answer = Math.floor(Math.random() * (maxAnswer + 1));
+    const b = Math.floor(Math.random() * (answer + 1));
+    const a = answer - b;
+    return { a, b, operator };
   }
 
+  const answer = Math.floor(Math.random() * (maxAnswer + 1));
+  const b = Math.floor(Math.random() * (maxAnswer - answer + 1));
+  const a = answer + b;
   return { a, b, operator };
 }
 
