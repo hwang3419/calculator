@@ -8,6 +8,9 @@ html, body, #root {
   padding: 0;
   overscroll-behavior: none;
   background-color: #f0fdf4; /* Default light green matching kids theme app */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Prevent double-tap zoom and highlighting on mobile devices */
@@ -80,4 +83,15 @@ html, body, #root {
 
 .animate-encouragement-pop {
   animation: encouragement-pop 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes badge-burst {
+  0% { transform: translateY(18px) scale(0.8); opacity: 0; }
+  18% { transform: translateY(0) scale(1.06); opacity: 1; }
+  65% { transform: translateY(-4px) scale(1); opacity: 1; }
+  100% { transform: translateY(-18px) scale(0.95); opacity: 0; }
+}
+
+.animate-badge-burst {
+  animation: badge-burst 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
