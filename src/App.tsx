@@ -6,6 +6,7 @@ import { NumberPad } from './components/NumberPad';
 import { FeedbackBanner } from './components/FeedbackBanner';
 import { RewardEffect } from './components/RewardEffect';
 import { BadgeUnlockEffect } from './components/BadgeUnlockEffect';
+import { BearRescueScene } from './components/BearRescueScene';
 import { ANSWER_RANGE_OPTIONS, type MathProblem, type ProblemMode, generateProblem, checkAnswer } from './utils/mathLogic';
 import { getRandomEncouragingPhrase, playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
 import { exportProgress, getUnlockedBadges, importProgressFile, loadProgress, saveProgress, type BadgeDefinition, type GameProgress } from './utils/progress';
@@ -15,6 +16,9 @@ const ENCOURAGEMENT_TEXT_DURATION_MS = 2200;
 const REWARD_EFFECT_DURATION_MS = 3000;
 const BADGE_UNLOCK_EFFECT_DURATION_MS = 2800;
 const STORAGE_MESSAGE_DURATION_MS = 2800;
+const BEAR_REACTION_DURATION_MS = 900;
+const BEAR_SUCCESS_DURATION_MS = 2200;
+const CORRECT_ANSWERS_PER_BEAR_STAGE = 3;
 
 function App() {
   const [progress, setProgress] = useState<GameProgress>(() => loadProgress());
@@ -33,6 +37,9 @@ function App() {
   const [badgeEffectKey, setBadgeEffectKey] = useState<number>(0);
   const [storageMessage, setStorageMessage] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [bearRescueStage, setBearRescueStage] = useState<number>(0);
+  const [bearReaction, setBearReaction] = useState<'idle' | 'sad' | 'success'>('idle');
+  const [bearStageProgress, setBearStageProgress] = useState<number>(0);
 
   const initProblem = useCallback(() => {
     setCurrentProblem(generateProblem({ mode: problemMode, answerRange }));
@@ -105,6 +112,22 @@ function App() {
   }, [storageMessage]);
 
   useEffect(() => {
+    if (bearReaction === 'idle') return;
+
+    const timer = window.setTimeout(() => {
+      if (bearReaction === 'success') {
+        setBearRescueStage(0);
+        setBearStageProgress(0);
+      }
+      setBearReaction('idle');
+    }, bearReaction === 'success' ? BEAR_SUCCESS_DURATION_MS : BEAR_REACTION_DURATION_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [bearReaction]);
+
+  useEffect(() => {
     const disableContextMenu = (event: MouseEvent) => {
       event.preventDefault();
     };
@@ -140,15 +163,19 @@ function App() {
 
     if (isCorrect) {
       const newStreak = streak + 1;
-      const phrase = getRandomEncouragingPhrase();
       const shouldShowHugeCelebration = newStreak > 0 && newStreak % 10 === 0;
       const unlockedBadges = getUnlockedBadges(newStreak);
       const badgesToCelebrate = unlockedBadges.filter((badge) => !progress.unlockedBadgeIds.includes(badge.id));
+      const nextBearStageProgress = bearStageProgress + 1;
+      const shouldAdvanceBearStage = nextBearStageProgress >= CORRECT_ANSWERS_PER_BEAR_STAGE;
+      const nextBearStage = shouldAdvanceBearStage ? Math.min(bearRescueStage + 1, 3) : bearRescueStage;
+      const didRescueBear = nextBearStage === 3;
       setStreak(newStreak);
-      setEncouragementText(phrase);
-      setIsHugeCelebration(shouldShowHugeCelebration);
-      setShowRewardEffect(true);
-      setRewardEffectKey((prev) => prev + 1);
+      setBearStageProgress(shouldAdvanceBearStage ? 0 : nextBearStageProgress);
+      if (shouldAdvanceBearStage) {
+        setBearRescueStage(nextBearStage);
+      }
+      setBearReaction(didRescueBear ? 'success' : 'idle');
       if (badgesToCelebrate.length > 0) {
         setNewlyUnlockedBadges(badgesToCelebrate);
         setBadgeEffectKey((prev) => prev + 1);
@@ -159,16 +186,26 @@ function App() {
         unlockedBadgeIds: Array.from(new Set([...prev.unlockedBadgeIds, ...unlockedBadges.map((badge) => badge.id)])),
       }));
 
-      if (shouldShowHugeCelebration) {
-        playHugeCelebrationSound();
-      } else {
-        playRandomRewardSound();
+      if (didRescueBear) {
+        const phrase = getRandomEncouragingPhrase();
+        setEncouragementText(phrase);
+        setIsHugeCelebration(shouldShowHugeCelebration);
+        setShowRewardEffect(true);
+        setRewardEffectKey((prev) => prev + 1);
+
+        if (shouldShowHugeCelebration) {
+          playHugeCelebrationSound();
+        } else {
+          playRandomRewardSound();
+        }
+        playEncouragingVoice(phrase);
       }
-      playEncouragingVoice(phrase);
     } else {
       setStreak(0);
       setIsHugeCelebration(false);
       setEncouragementText(null);
+      setShowRewardEffect(false);
+      setBearReaction('sad');
     }
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
@@ -330,6 +367,12 @@ function App() {
 
           {/* Left Side: Problem & Input */}
           <div className="w-full landscape:w-1/2 lg:w-1/2 flex flex-col items-center justify-center max-w-md">
+            <BearRescueScene
+              stage={bearRescueStage}
+              reaction={bearReaction}
+              stageProgress={bearStageProgress}
+              answersPerStage={CORRECT_ANSWERS_PER_BEAR_STAGE}
+            />
             <ProblemDisplay problem={currentProblem} />
 
             {feedback ? (
