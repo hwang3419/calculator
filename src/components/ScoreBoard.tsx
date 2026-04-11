@@ -17,21 +17,21 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
   const [showBadges, setShowBadges] = useState(false);
 
   return (
-    <div className="w-full rounded-2xl bg-white px-4 py-3 shadow-sm md:px-5 md:py-4">
-      <div className="mb-3 grid gap-3 md:grid-cols-3">
-        <div className="rounded-2xl bg-blue-50 px-4 py-3">
+    <div className="w-full rounded-[1.75rem] bg-white px-3 py-3 shadow-sm md:px-4 md:py-3">
+      <div className="mb-2 grid gap-2 md:grid-cols-3">
+        <div className="rounded-2xl bg-blue-50 px-3 py-2.5">
           <div className="text-xs font-bold uppercase tracking-wide text-blue-500">Score</div>
-          <div className="mt-1 text-xl font-extrabold text-gray-700">
+          <div className="mt-1 text-lg font-extrabold text-gray-700 md:text-xl">
             {score.correct} / {score.total}
           </div>
         </div>
-        <div className="rounded-2xl bg-yellow-50 px-4 py-3">
+        <div className="rounded-2xl bg-yellow-50 px-3 py-2.5">
           <div className="text-xs font-bold uppercase tracking-wide text-yellow-600">Stars</div>
-          <div className="mt-1 text-xl font-extrabold text-gray-700">⭐ {stars}</div>
+          <div className="mt-1 text-lg font-extrabold text-gray-700 md:text-xl">⭐ {stars}</div>
         </div>
-        <div className="rounded-2xl bg-emerald-50 px-4 py-3">
+        <div className="rounded-2xl bg-emerald-50 px-3 py-2.5">
           <div className="text-xs font-bold uppercase tracking-wide text-emerald-600">Best Streak</div>
-          <div className="mt-1 text-xl font-extrabold text-gray-700">🔥 {bestStreak}</div>
+          <div className="mt-1 text-lg font-extrabold text-gray-700 md:text-xl">🔥 {bestStreak}</div>
         </div>
       </div>
 
@@ -39,11 +39,11 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
         <button
           type="button"
           onClick={() => setShowBadges((prev) => !prev)}
-          className="flex w-full items-center justify-between rounded-2xl bg-gradient-to-r from-amber-100 to-yellow-50 px-4 py-3 text-left shadow-sm ring-1 ring-yellow-200"
+          className="flex w-full items-center justify-between rounded-2xl bg-gradient-to-r from-amber-100 to-yellow-50 px-4 py-2.5 text-left shadow-sm ring-1 ring-yellow-200"
         >
           <div>
             <div className="text-xs font-bold uppercase tracking-wide text-amber-700">Badges</div>
-            <div className="mt-1 text-sm font-extrabold text-amber-900">
+            <div className="mt-1 text-xs font-extrabold text-amber-900 md:text-sm">
               {showBadges ? 'Hide badge collection' : 'Tap to open badge collection'}
             </div>
           </div>
@@ -56,7 +56,7 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
         </button>
 
         {showBadges && (
-          <div className="mt-3">
+          <div className="mt-2 max-h-44 overflow-y-auto">
             <BadgeGallery unlockedBadgeIds={unlockedBadgeIds} />
           </div>
         )}

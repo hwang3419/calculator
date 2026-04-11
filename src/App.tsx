@@ -248,18 +248,18 @@ function App() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#f0fdf4] font-sans flex flex-col items-center py-2 md:py-6 px-4 selection:bg-transparent overflow-x-hidden">
+    <div className="h-[100dvh] bg-[#f0fdf4] font-sans overflow-hidden px-3 py-2 selection:bg-transparent md:px-4 md:py-3">
       {showRewardEffect && <RewardEffect key={rewardEffectKey} isHuge={isHugeCelebration} />}
       {newlyUnlockedBadges.length > 0 && <BadgeUnlockEffect key={badgeEffectKey} badges={newlyUnlockedBadges} />}
       {encouragementText && (
-        <div className="pointer-events-none absolute inset-x-0 top-24 md:top-28 z-[110] flex justify-center px-4">
-          <div className="animate-encouragement-pop rounded-full border-4 border-yellow-300 bg-gradient-to-r from-yellow-200 via-pink-200 to-cyan-200 px-6 py-3 text-center text-2xl font-extrabold text-orange-700 shadow-[0_16px_40px_rgba(251,191,36,0.45)] md:px-8 md:text-4xl">
+        <div className="pointer-events-none absolute inset-x-0 top-18 z-[110] flex justify-center px-4 md:top-20">
+          <div className="animate-encouragement-pop rounded-full border-4 border-yellow-300 bg-gradient-to-r from-yellow-200 via-pink-200 to-cyan-200 px-5 py-2 text-center text-xl font-extrabold text-orange-700 shadow-[0_16px_40px_rgba(251,191,36,0.45)] md:px-7 md:text-3xl">
             {encouragementText}
           </div>
         </div>
       )}
 
-      <div className="w-full max-w-md landscape:max-w-4xl lg:max-w-4xl flex flex-col relative z-10 flex-grow py-2">
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col">
         <div className="absolute right-0 top-0 z-[130]">
           <button
             type="button"
@@ -346,14 +346,14 @@ function App() {
         </div>
 
         {/* Header */}
-        <div className="flex justify-center items-center mb-2 md:mb-6 shrink-0">
-          <h1 className="text-2xl md:text-4xl font-extrabold text-center text-green-600 drop-shadow-sm tracking-tight bg-white px-4 md:px-6 py-1 md:py-2 rounded-full border-4 border-green-200">
+        <div className="mb-2 flex shrink-0 items-center justify-center md:mb-3">
+          <h1 className="rounded-full border-4 border-green-200 bg-white px-4 py-1 text-center text-xl font-extrabold tracking-tight text-green-600 drop-shadow-sm md:px-6 md:py-2 md:text-3xl">
             Kids Math <span className="inline-block hover:animate-spin">🚀</span>
           </h1>
         </div>
 
         {/* ScoreBoard */}
-        <div className="shrink-0 max-w-md mx-auto w-full landscape:max-w-lg lg:max-w-lg">
+        <div className="mx-auto mb-2 w-full max-w-5xl shrink-0">
           <ScoreBoard
             score={score}
             stars={progress.stars}
@@ -363,10 +363,10 @@ function App() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex flex-col landscape:flex-row lg:flex-row w-full gap-2 md:gap-8 flex-grow items-center justify-center">
+        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
 
           {/* Left Side: Problem & Input */}
-          <div className="w-full landscape:w-1/2 lg:w-1/2 flex flex-col items-center justify-center max-w-md">
+          <div className="flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-white/55 p-2 shadow-sm ring-1 ring-white/70 md:p-3">
             <BearRescueScene
               stage={bearRescueStage}
               reaction={bearReaction}
@@ -387,16 +387,20 @@ function App() {
           </div>
 
           {/* Right Side: Number Pad */}
-          {!feedback && (
-            <div className="w-full landscape:w-1/2 lg:w-1/2 flex items-center justify-center max-w-md mt-2 md:mt-0">
+          <div className="flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
+            {feedback ? (
+              <div className="flex h-full items-center justify-center rounded-[1.5rem] border-2 border-dashed border-slate-200 bg-white/60 px-6 py-8 text-center text-sm font-bold text-slate-500 md:text-base">
+                Solve the feedback first, then the keypad will come back.
+              </div>
+            ) : (
               <NumberPad
                 onNumberClick={handleNumberClick}
                 onClear={handleClear}
                 onSubmit={handleSubmit}
                 disabled={!!feedback}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

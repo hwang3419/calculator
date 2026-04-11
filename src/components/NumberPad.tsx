@@ -17,7 +17,7 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onClear, on
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2 md:gap-4 w-full max-w-sm mx-auto">
+    <div className="mx-auto grid w-full max-w-md grid-cols-3 gap-2">
       {buttons.map((btn) => {
         let bgColor = "bg-white text-gray-800 shadow-sm border-b-4 border-gray-200 hover:bg-gray-50 active:border-b-0 active:translate-y-1";
         if (btn === 'C') bgColor = "bg-red-100 text-red-600 shadow-sm border-b-4 border-red-200 hover:bg-red-200 active:border-b-0 active:translate-y-1";
@@ -33,7 +33,7 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onClear, on
               else if (btn === '✓') onSubmit();
               else onNumberClick(btn);
             }}
-            className={`${bgColor} transition-all text-3xl md:text-4xl font-extrabold h-14 sm:h-16 landscape:h-12 md:landscape:h-16 lg:landscape:h-24 md:h-24 rounded-xl md:rounded-2xl flex items-center justify-center select-none ${disabled ? 'opacity-50 cursor-not-allowed pointer-events-none border-b-0 translate-y-1' : 'cursor-pointer'}`}
+            className={`${bgColor} flex h-16 select-none items-center justify-center rounded-2xl text-3xl font-extrabold transition-all md:h-20 md:text-4xl ${disabled ? 'pointer-events-none translate-y-1 cursor-not-allowed border-b-0 opacity-50' : 'cursor-pointer'}`}
           >
             {btn}
           </button>

@@ -9,8 +9,8 @@ export const ProblemDisplay: React.FC<ProblemDisplayProps> = ({ problem }) => {
   if (!problem) return null;
 
   return (
-    <div className="flex justify-center items-center w-full min-h-[120px] md:min-h-[180px] bg-white rounded-3xl shadow-sm mb-3 md:mb-6 border-4 border-white">
-      <div className="text-6xl md:text-8xl font-extrabold text-gray-800 tracking-wider flex gap-3 md:gap-4 items-center">
+    <div className="mb-2 flex min-h-[88px] w-full items-center justify-center rounded-[1.75rem] border-4 border-white bg-white shadow-sm md:min-h-[118px]">
+      <div className="flex items-center gap-2 text-4xl font-extrabold tracking-wider text-gray-800 md:gap-3 md:text-6xl">
         <span>{problem.a}</span>
         <span className={problem.operator === '+' ? "text-blue-500" : "text-purple-500"}>{problem.operator}</span>
         <span>{problem.b}</span>

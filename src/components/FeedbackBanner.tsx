@@ -12,14 +12,14 @@ export const FeedbackBanner: React.FC<FeedbackBannerProps> = ({ status, correctA
   const isCorrect = status === 'correct';
 
   return (
-    <div className={`w-full max-w-sm mx-auto mb-3 md:mb-6 p-4 md:p-6 rounded-3xl shadow-lg flex flex-col items-center justify-center transition-all duration-300 ${
+    <div className={`mx-auto mb-2 flex w-full max-w-sm flex-col items-center justify-center rounded-[1.75rem] p-3 md:p-4 shadow-lg transition-all duration-300 ${
       isCorrect ? 'bg-green-100 text-green-800 border-4 border-green-400 scale-100' : 'bg-red-100 text-red-800 border-4 border-red-400 scale-100'
     }`}>
-      <h2 className="text-2xl md:text-3xl font-extrabold mb-2 md:mb-3">
+      <h2 className="mb-1 text-xl font-extrabold md:mb-2 md:text-2xl">
         {isCorrect ? '🎉 Correct!' : 'Oops!'}
       </h2>
       {!isCorrect && correctAnswer !== undefined && (
-        <p className="text-lg md:text-xl mb-3 md:mb-4 font-medium">
+        <p className="mb-2 text-base font-medium md:text-lg">
           The right answer is <span className="font-extrabold text-xl md:text-2xl">{correctAnswer}</span>
         </p>
       )}
@@ -31,7 +31,7 @@ export const FeedbackBanner: React.FC<FeedbackBannerProps> = ({ status, correctA
       ) : (
         <button 
           onClick={onRetry}
-          className="bg-red-500 text-white text-lg md:text-xl font-extrabold py-3 md:py-4 px-6 md:px-8 rounded-2xl active:scale-95 shadow-sm border-b-4 border-red-600 active:border-b-0 active:translate-y-1 w-full transition-all"
+          className="w-full rounded-2xl border-b-4 border-red-600 bg-red-500 px-5 py-2.5 text-base font-extrabold text-white shadow-sm transition-all active:translate-y-1 active:scale-95 active:border-b-0 md:text-lg"
         >
           Try Another
         </button>
