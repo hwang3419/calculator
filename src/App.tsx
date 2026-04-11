@@ -9,7 +9,7 @@ import { BadgeUnlockEffect } from './components/BadgeUnlockEffect';
 import { BearRescueScene } from './components/BearRescueScene';
 import { ANSWER_RANGE_OPTIONS, type MathProblem, type ProblemMode, generateProblem, checkAnswer } from './utils/mathLogic';
 import { getRandomEncouragingPhrase, playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
-import { exportProgress, getUnlockedBadges, importProgressFile, loadProgress, saveProgress, type BadgeDefinition, type GameProgress } from './utils/progress';
+import { exportProgress, getUnlockedBadges, importProgressFile, loadProgress, saveProgress, type BadgeDefinition, type GameProgress, BADGE_DEFINITIONS } from './utils/progress';
 
 const AUTO_NEXT_DELAY_MS = 500;
 const ENCOURAGEMENT_TEXT_DURATION_MS = 2200;
@@ -37,6 +37,7 @@ function App() {
   const [badgeEffectKey, setBadgeEffectKey] = useState<number>(0);
   const [storageMessage, setStorageMessage] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showBadges, setShowBadges] = useState<boolean>(false);
   const [bearRescueStage, setBearRescueStage] = useState<number>(0);
   const [bearReaction, setBearReaction] = useState<'idle' | 'sad' | 'success'>('idle');
   const [bearStageProgress, setBearStageProgress] = useState<number>(0);
@@ -249,6 +250,58 @@ function App() {
 
   return (
     <div className="game-shell h-[100dvh] bg-[#f0fdf4] font-sans overflow-hidden px-3 py-2 selection:bg-transparent md:px-4 md:py-3">
+      {showBadges && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" onClick={() => setShowBadges(false)}>
+          <div 
+            className="w-full max-w-2xl flex-col rounded-[2rem] border-4 border-yellow-200 bg-gradient-to-b from-amber-50 to-orange-50 p-4 shadow-[0_20px_50px_rgba(217,119,6,0.3)] md:p-6"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-xl font-extrabold uppercase tracking-wide text-amber-800 md:text-2xl">Badge Collection</div>
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl bg-white px-3 py-1 font-bold text-amber-900 shadow-sm ring-1 ring-amber-200/50">
+                  {progress.unlockedBadgeIds.length} / {BADGE_DEFINITIONS.length}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBadges(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-200 text-lg font-extrabold text-amber-800 transition-transform active:scale-95"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto pb-2 pr-2 custom-scrollbar">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {BADGE_DEFINITIONS.map(badge => {
+                  const unlocked = progress.unlockedBadgeIds.includes(badge.id);
+                  return (
+                    <div 
+                      key={badge.id} 
+                      className={`flex aspect-square flex-col items-center justify-center rounded-[1.5rem] border-2 p-2 text-center shadow-sm transition-all ${
+                        unlocked 
+                          ? 'border-yellow-300 bg-white shadow-amber-200/50' 
+                          : 'border-dashed border-amber-200/60 bg-amber-100/30'
+                      }`}
+                    >
+                      <div className={`mb-2 text-4xl md:text-5xl ${!unlocked && 'opacity-60 grayscale'}`}>
+                        {unlocked ? badge.emoji : '🔒'}
+                      </div>
+                      <div className={`text-xs font-bold leading-tight ${unlocked ? 'text-amber-900' : 'text-amber-700/60'}`}>
+                        {badge.name}
+                      </div>
+                      <div className={`mt-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${unlocked ? 'bg-amber-100 text-amber-700' : 'text-amber-600/50'}`}>
+                        {unlocked ? `Streak ${badge.streakRequired}` : `${badge.streakRequired} in a row`}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {showRewardEffect && <RewardEffect key={rewardEffectKey} isHuge={isHugeCelebration} />}
       {newlyUnlockedBadges.length > 0 && <BadgeUnlockEffect key={badgeEffectKey} badges={newlyUnlockedBadges} />}
       {encouragementText && (
@@ -352,6 +405,7 @@ function App() {
             stars={progress.stars}
             bestStreak={progress.bestStreak}
             unlockedBadgeIds={progress.unlockedBadgeIds}
+            onOpenBadges={() => setShowBadges(true)}
           />
         </div>
 
