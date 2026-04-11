@@ -356,9 +356,9 @@ function App() {
         </div>
 
         {/* Main Content Area */}
-        <div className="game-main grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)]">
+        <div className="game-main grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(320px,0.95fr)]">
 
-          {/* Left Side: Problem & Input */}
+          {/* Left Side: Bear Scene */}
           <div className="game-left-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-white/55 p-2 shadow-sm ring-1 ring-white/70 md:p-3">
             <BearRescueScene
               stage={bearRescueStage}
@@ -366,6 +366,10 @@ function App() {
               stageProgress={bearStageProgress}
               answersPerStage={CORRECT_ANSWERS_PER_BEAR_STAGE}
             />
+          </div>
+
+          {/* Right Side: Problem, Input, Number Pad */}
+          <div className="game-right-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
             <ProblemDisplay problem={currentProblem} />
 
             {feedback ? (
@@ -377,21 +381,18 @@ function App() {
             ) : (
               <AnswerInput value={userAnswer} />
             )}
-          </div>
 
-          {/* Right Side: Number Pad */}
-          <div className="game-right-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
-            {feedback ? (
-              <div className="flex h-full items-center justify-center rounded-[1.5rem] border-2 border-dashed border-slate-200 bg-white/60 px-6 py-8 text-center text-sm font-bold text-slate-500 md:text-base">
-                Solve the feedback first, then the keypad will come back.
-              </div>
-            ) : (
+            {!feedback ? (
               <NumberPad
                 onNumberClick={handleNumberClick}
                 onClear={handleClear}
                 onSubmit={handleSubmit}
                 disabled={!!feedback}
               />
+            ) : (
+              <div className="flex h-full min-h-24 items-center justify-center rounded-[1.5rem] border-2 border-dashed border-slate-200 bg-white/60 px-6 py-6 text-center text-sm font-bold text-slate-500 md:text-base">
+                Solve the feedback first, then the keypad will come back.
+              </div>
             )}
           </div>
         </div>
