@@ -12,7 +12,7 @@ export const FeedbackBanner: React.FC<FeedbackBannerProps> = ({ status, correctA
   const isCorrect = status === 'correct';
 
   return (
-    <div className={`mx-auto mb-2 flex w-full max-w-sm flex-col items-center justify-center rounded-[1.75rem] p-3 md:p-4 shadow-lg transition-all duration-300 ${
+    <div className={`feedback-banner mx-auto mb-2 flex w-full max-w-sm flex-col items-center justify-center rounded-[1.75rem] p-3 md:p-4 shadow-lg transition-all duration-300 ${
       isCorrect ? 'bg-green-100 text-green-800 border-4 border-green-400 scale-100' : 'bg-red-100 text-red-800 border-4 border-red-400 scale-100'
     }`}>
       <h2 className="mb-1 text-xl font-extrabold md:mb-2 md:text-2xl">

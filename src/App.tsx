@@ -248,7 +248,7 @@ function App() {
   };
 
   return (
-    <div className="h-[100dvh] bg-[#f0fdf4] font-sans overflow-hidden px-3 py-2 selection:bg-transparent md:px-4 md:py-3">
+    <div className="game-shell h-[100dvh] bg-[#f0fdf4] font-sans overflow-hidden px-3 py-2 selection:bg-transparent md:px-4 md:py-3">
       {showRewardEffect && <RewardEffect key={rewardEffectKey} isHuge={isHugeCelebration} />}
       {newlyUnlockedBadges.length > 0 && <BadgeUnlockEffect key={badgeEffectKey} badges={newlyUnlockedBadges} />}
       {encouragementText && (
@@ -259,7 +259,7 @@ function App() {
         </div>
       )}
 
-      <div className="relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col">
+      <div className="game-frame relative z-10 mx-auto flex h-full w-full max-w-6xl flex-col">
         <div className="absolute right-0 top-0 z-[130]">
           <button
             type="button"
@@ -345,15 +345,8 @@ function App() {
           )}
         </div>
 
-        {/* Header */}
-        <div className="mb-2 flex shrink-0 items-center justify-center md:mb-3">
-          <h1 className="rounded-full border-4 border-green-200 bg-white px-4 py-1 text-center text-xl font-extrabold tracking-tight text-green-600 drop-shadow-sm md:px-6 md:py-2 md:text-3xl">
-            Kids Math <span className="inline-block hover:animate-spin">🚀</span>
-          </h1>
-        </div>
-
         {/* ScoreBoard */}
-        <div className="mx-auto mb-2 w-full max-w-5xl shrink-0">
+        <div className="game-scoreboard mx-auto mb-2 w-full max-w-5xl shrink-0">
           <ScoreBoard
             score={score}
             stars={progress.stars}
@@ -363,10 +356,10 @@ function App() {
         </div>
 
         {/* Main Content Area */}
-        <div className="grid min-h-0 flex-1 gap-3 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+        <div className="game-main grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,1.05fr)_minmax(280px,0.95fr)]">
 
           {/* Left Side: Problem & Input */}
-          <div className="flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-white/55 p-2 shadow-sm ring-1 ring-white/70 md:p-3">
+          <div className="game-left-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-white/55 p-2 shadow-sm ring-1 ring-white/70 md:p-3">
             <BearRescueScene
               stage={bearRescueStage}
               reaction={bearReaction}
@@ -387,7 +380,7 @@ function App() {
           </div>
 
           {/* Right Side: Number Pad */}
-          <div className="flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
+          <div className="game-right-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
             {feedback ? (
               <div className="flex h-full items-center justify-center rounded-[1.5rem] border-2 border-dashed border-slate-200 bg-white/60 px-6 py-8 text-center text-sm font-bold text-slate-500 md:text-base">
                 Solve the feedback first, then the keypad will come back.
