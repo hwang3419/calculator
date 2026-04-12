@@ -26,7 +26,7 @@ function getOperatorsForMode(mode: ProblemMode): Operator[] {
 }
 
 export function generateProblem(settings: ProblemSettings): MathProblem {
-  const maxAnswer = Math.max(0, settings.answerRange);
+  const maxAnswer = Math.max(1, settings.answerRange);
   const operators = getOperatorsForMode(settings.mode);
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
@@ -45,7 +45,7 @@ export function generateProblem(settings: ProblemSettings): MathProblem {
 
 export function checkAnswer(problem: MathProblem, userAnswer: string): boolean {
   if (!userAnswer || userAnswer.trim() === '') return false;
-  
+
   const correct =
     problem.operator === '+' ? problem.a + problem.b : problem.a - problem.b;
 
