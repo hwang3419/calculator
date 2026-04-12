@@ -18,10 +18,10 @@ const STAGE_COPY = [
 ];
 
 const IMAGE_POSITIONS = [
-  { x: '-50%', y: '-50%' },
-  { x: '0%', y: '-50%' },
-  { x: '-50%', y: '0%' },
   { x: '0%', y: '0%' },
+  { x: '-50%', y: '0%' },
+  { x: '0%', y: '-50%' },
+  { x: '-50%', y: '-50%' },
 ];
 
 export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reaction, stageProgress, answersPerStage }) => {
@@ -76,9 +76,8 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
         <div className="aspect-[11/6] w-full" />
 
         <div
-          className={`absolute inset-0 overflow-hidden transition-transform duration-500 ${
-            reaction === 'sad' ? 'animate-bear-photo-shake' : reaction === 'success' ? 'animate-bear-photo-pop' : ''
-          } ${incomingStage !== null ? 'animate-bear-stage-fade-out' : ''}`}
+          className={`absolute inset-0 overflow-hidden transition-transform duration-500 ${reaction === 'sad' ? 'animate-bear-photo-shake' : reaction === 'success' ? 'animate-bear-photo-pop' : ''
+            } ${incomingStage !== null ? 'animate-bear-stage-fade-out' : ''}`}
         >
           <img
             src={bearRescueStages}
