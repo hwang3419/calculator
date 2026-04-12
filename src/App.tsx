@@ -41,11 +41,14 @@ function App() {
   const [bearRescueStage, setBearRescueStage] = useState<number>(0);
   const [bearReaction, setBearReaction] = useState<'idle' | 'sad' | 'success'>('idle');
   const [bearStageProgress, setBearStageProgress] = useState<number>(0);
+  const [pauseForNext, setPauseForNext] = useState<boolean>(false);
+  const [problemStartTime, setProblemStartTime] = useState<number>(Date.now());
 
   const initProblem = useCallback(() => {
     setCurrentProblem(generateProblem({ mode: problemMode, answerRange }));
     setUserAnswer('');
     setFeedback(null);
+    setProblemStartTime(Date.now());
   }, [answerRange, problemMode]);
 
   useEffect(() => {
@@ -54,6 +57,7 @@ function App() {
 
   useEffect(() => {
     if (feedback !== 'correct') return;
+    if (pauseForNext) return;
 
     const timer = window.setTimeout(() => {
       initProblem();
@@ -62,7 +66,7 @@ function App() {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [feedback, initProblem]);
+  }, [feedback, initProblem, pauseForNext]);
 
   useEffect(() => {
     if (!encouragementText) return;
@@ -114,6 +118,7 @@ function App() {
 
   useEffect(() => {
     if (bearReaction === 'idle') return;
+    if (bearReaction === 'success' && pauseForNext) return;
 
     const timer = window.setTimeout(() => {
       if (bearReaction === 'success') {
@@ -126,7 +131,7 @@ function App() {
     return () => {
       window.clearTimeout(timer);
     };
-  }, [bearReaction]);
+  }, [bearReaction, pauseForNext]);
 
   useEffect(() => {
     const disableContextMenu = (event: MouseEvent) => {
@@ -165,27 +170,44 @@ function App() {
     if (isCorrect) {
       const newStreak = streak + 1;
       const shouldShowHugeCelebration = newStreak > 0 && newStreak % 10 === 0;
-      const unlockedBadges = getUnlockedBadges(newStreak);
-      const badgesToCelebrate = unlockedBadges.filter((badge) => !progress.unlockedBadgeIds.includes(badge.id));
+      
       const nextBearStageProgress = bearStageProgress + 1;
       const shouldAdvanceBearStage = nextBearStageProgress >= CORRECT_ANSWERS_PER_BEAR_STAGE;
       const nextBearStage = shouldAdvanceBearStage ? Math.min(bearRescueStage + 1, 3) : bearRescueStage;
       const didRescueBear = nextBearStage === 3;
+      
       setStreak(newStreak);
       setBearStageProgress(shouldAdvanceBearStage ? 0 : nextBearStageProgress);
       if (shouldAdvanceBearStage) {
         setBearRescueStage(nextBearStage);
       }
       setBearReaction(didRescueBear ? 'success' : 'idle');
+
+      const timeTaken = Date.now() - problemStartTime;
+      const isFast = timeTaken < 3000;
+
+      const nextProgress = {
+        ...progress,
+        stars: progress.stars + 1,
+        totalAnswers: progress.totalAnswers + 1,
+        bestStreak: Math.max(progress.bestStreak, newStreak),
+        subtractionCorrect: progress.subtractionCorrect + (currentProblem.operator === '-' ? 1 : 0),
+        bearsRescued: progress.bearsRescued + (didRescueBear ? 1 : 0),
+        fastAnswers: progress.fastAnswers + (isFast ? 1 : 0),
+      };
+
+      const unlockedBadges = getUnlockedBadges(nextProgress);
+      const badgesToCelebrate = unlockedBadges.filter((badge) => !progress.unlockedBadgeIds.includes(badge.id));
+
       if (badgesToCelebrate.length > 0) {
         setNewlyUnlockedBadges(badgesToCelebrate);
         setBadgeEffectKey((prev) => prev + 1);
       }
-      setProgress((prev) => ({
-        stars: prev.stars + 1,
-        bestStreak: Math.max(prev.bestStreak, newStreak),
-        unlockedBadgeIds: Array.from(new Set([...prev.unlockedBadgeIds, ...unlockedBadges.map((badge) => badge.id)])),
-      }));
+
+      setProgress({
+        ...nextProgress,
+        unlockedBadgeIds: Array.from(new Set([...progress.unlockedBadgeIds, ...unlockedBadges.map(b => b.id)])),
+      });
 
       if (didRescueBear) {
         const phrase = getRandomEncouragingPhrase();
@@ -193,6 +215,7 @@ function App() {
         setIsHugeCelebration(shouldShowHugeCelebration);
         setShowRewardEffect(true);
         setRewardEffectKey((prev) => prev + 1);
+        setPauseForNext(true);
 
         if (shouldShowHugeCelebration) {
           playHugeCelebrationSound();
@@ -292,7 +315,7 @@ function App() {
                         {badge.name}
                       </div>
                       <div className={`mt-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${unlocked ? 'bg-amber-100 text-amber-700' : 'text-amber-600/50'}`}>
-                        {unlocked ? `Streak ${badge.streakRequired}` : `${badge.streakRequired} in a row`}
+                        {badge.description}
                       </div>
                     </div>
                   );
@@ -405,6 +428,7 @@ function App() {
             stars={progress.stars}
             bestStreak={progress.bestStreak}
             unlockedBadgeIds={progress.unlockedBadgeIds}
+            bearsRescued={progress.bearsRescued}
             onOpenBadges={() => setShowBadges(true)}
           />
         </div>
@@ -443,6 +467,23 @@ function App() {
                 onSubmit={handleSubmit}
                 disabled={!!feedback}
               />
+            ) : pauseForNext ? (
+              <div className="flex h-full min-h-24 flex-col items-center justify-center rounded-[1.5rem] border-2 border-dashed border-amber-200 bg-orange-50 px-6 py-6 text-center shadow-sm">
+                <div className="mb-4 text-xl font-extrabold text-amber-800 md:text-2xl">Bear Rescued! 🐻</div>
+                <button
+                  type="button"
+                  className="rounded-full bg-amber-400 px-8 py-3 text-lg font-extrabold text-amber-900 shadow-[0_4px_14px_rgba(251,191,36,0.39)] transition-transform active:scale-95 md:px-12 md:text-xl"
+                  onClick={() => {
+                    setBearRescueStage(0);
+                    setBearStageProgress(0);
+                    setBearReaction('idle');
+                    setPauseForNext(false);
+                    initProblem();
+                  }}
+                >
+                  Continue ➔
+                </button>
+              </div>
             ) : (
               <div className="flex h-full min-h-24 items-center justify-center rounded-[1.5rem] border-2 border-dashed border-slate-200 bg-white/60 px-6 py-6 text-center text-sm font-bold text-slate-500 md:text-base">
                 Solve the feedback first, then the keypad will come back.

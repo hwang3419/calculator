@@ -2,13 +2,18 @@ export interface BadgeDefinition {
   id: string;
   name: string;
   emoji: string;
-  streakRequired: number;
+  description: string;
+  checkUnlock: (progress: GameProgress) => boolean;
 }
 
 export interface GameProgress {
   stars: number;
   bestStreak: number;
   unlockedBadgeIds: string[];
+  bearsRescued: number;
+  subtractionCorrect: number;
+  fastAnswers: number;
+  totalAnswers: number;
 }
 
 interface ExportedProgressFile {
@@ -18,20 +23,30 @@ interface ExportedProgressFile {
 }
 
 export const BADGE_DEFINITIONS: BadgeDefinition[] = [
-  { id: 'streak-2', name: 'Spark Start', emoji: '✨', streakRequired: 2 },
-  { id: 'streak-3', name: 'Hot Streak', emoji: '🔥', streakRequired: 3 },
-  { id: 'streak-4', name: 'Speedy Paws', emoji: '🐾', streakRequired: 4 },
-  { id: 'streak-5', name: 'Rocket Run', emoji: '🚀', streakRequired: 5 },
-  { id: 'streak-6', name: 'Sunny Solver', emoji: '🌞', streakRequired: 6 },
-  { id: 'streak-7', name: 'Rainbow Rush', emoji: '🌈', streakRequired: 7 },
-  { id: 'streak-8', name: 'Star Rider', emoji: '🌟', streakRequired: 8 },
-  { id: 'streak-10', name: 'Math Champion', emoji: '🏆', streakRequired: 10 },
-  { id: 'streak-12', name: 'Treasure Mind', emoji: '💎', streakRequired: 12 },
-  { id: 'streak-15', name: 'Thunder Brain', emoji: '⚡', streakRequired: 15 },
-  { id: 'streak-20', name: 'Galaxy Hero', emoji: '🪐', streakRequired: 20 },
-  { id: 'streak-25', name: 'Golden Crown', emoji: '👑', streakRequired: 25 },
-  { id: 'streak-30', name: 'Mega Wizard', emoji: '🧙', streakRequired: 30 },
-  { id: 'streak-50', name: 'Legend Mode', emoji: '🐉', streakRequired: 50 },
+  // Streak Badges (Fire)
+  { id: 'streak-2', name: 'Spark Start', emoji: '✨', description: 'Streak 2', checkUnlock: p => p.bestStreak >= 2 },
+  { id: 'streak-5', name: 'Rocket Run', emoji: '🚀', description: 'Streak 5', checkUnlock: p => p.bestStreak >= 5 },
+  { id: 'streak-10', name: 'Math Champion', emoji: '🏆', description: 'Streak 10', checkUnlock: p => p.bestStreak >= 10 },
+  { id: 'streak-20', name: 'Galaxy Hero', emoji: '🪐', description: 'Streak 20', checkUnlock: p => p.bestStreak >= 20 },
+  { id: 'streak-50', name: 'Legend Mode', emoji: '🐉', description: 'Streak 50', checkUnlock: p => p.bestStreak >= 50 },
+
+  // Total Score / Accumulation (Stars)
+  { id: 'total-50', name: 'Half Century', emoji: '🎯', description: '50 Correct', checkUnlock: p => p.stars >= 50 },
+  { id: 'total-100', name: 'Century Club', emoji: '💯', description: '100 Correct', checkUnlock: p => p.stars >= 100 },
+  { id: 'total-500', name: 'Star Catcher', emoji: '🌟', description: '500 Correct', checkUnlock: p => p.stars >= 500 },
+
+  // Bears Rescued!
+  { id: 'bear-hero-1', name: 'Bear Helper', emoji: '🐻', description: 'Rescue 1 Bear', checkUnlock: p => p.bearsRescued >= 1 },
+  { id: 'bear-hero-5', name: 'Bear Savior', emoji: '🍯', description: 'Rescue 5 Bears', checkUnlock: p => p.bearsRescued >= 5 },
+  { id: 'bear-hero-10', name: 'Forest King', emoji: '🌲', description: 'Rescue 10 Bears', checkUnlock: p => p.bearsRescued >= 10 },
+
+  // Subtraction 
+  { id: 'minus-10', name: 'Minus Novice', emoji: '➖', description: '10 Subtractions', checkUnlock: p => p.subtractionCorrect >= 10 },
+  { id: 'minus-50', name: 'Minus Master', emoji: '🥷', description: '50 Subtractions', checkUnlock: p => p.subtractionCorrect >= 50 },
+
+  // Speed / Fast Answers
+  { id: 'fast-1', name: 'Lightning Flash', emoji: '⚡', description: 'Fast Answer!', checkUnlock: p => p.fastAnswers >= 1 },
+  { id: 'fast-10', name: 'Time Ninja', emoji: '⏱️', description: '10 Fast Answers', checkUnlock: p => p.fastAnswers >= 10 },
 ];
 
 const STORAGE_KEY = 'kids-math-progress-v1';
@@ -40,6 +55,10 @@ const DEFAULT_PROGRESS: GameProgress = {
   stars: 0,
   bestStreak: 0,
   unlockedBadgeIds: [],
+  bearsRescued: 0,
+  subtractionCorrect: 0,
+  fastAnswers: 0,
+  totalAnswers: 0,
 };
 
 export function loadProgress(): GameProgress {
@@ -61,8 +80,8 @@ export function saveProgress(progress: GameProgress) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
 }
 
-export function getUnlockedBadges(bestStreak: number) {
-  return BADGE_DEFINITIONS.filter((badge) => bestStreak >= badge.streakRequired);
+export function getUnlockedBadges(progress: GameProgress) {
+  return BADGE_DEFINITIONS.filter((badge) => badge.checkUnlock(progress));
 }
 
 export function normalizeProgress(progress: Partial<GameProgress>): GameProgress {
@@ -72,6 +91,10 @@ export function normalizeProgress(progress: Partial<GameProgress>): GameProgress
     unlockedBadgeIds: Array.isArray(progress.unlockedBadgeIds)
       ? progress.unlockedBadgeIds.filter((value): value is string => typeof value === 'string')
       : [],
+    bearsRescued: Number.isFinite(progress.bearsRescued) ? Math.max(0, progress.bearsRescued as number) : 0,
+    subtractionCorrect: Number.isFinite(progress.subtractionCorrect) ? Math.max(0, progress.subtractionCorrect as number) : 0,
+    fastAnswers: Number.isFinite(progress.fastAnswers) ? Math.max(0, progress.fastAnswers as number) : 0,
+    totalAnswers: Number.isFinite(progress.totalAnswers) ? Math.max(0, progress.totalAnswers as number) : 0,
   };
 }
 

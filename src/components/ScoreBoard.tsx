@@ -5,6 +5,7 @@ interface ScoreBoardProps {
   stars: number;
   bestStreak: number;
   unlockedBadgeIds: string[];
+  bearsRescued: number;
   onOpenBadges?: () => void;
 }
 
@@ -13,15 +14,16 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
   stars,
   bestStreak,
   unlockedBadgeIds,
+  bearsRescued,
   onOpenBadges,
 }) => {
   return (
     <div className="scoreboard-panel w-full rounded-[1.75rem] bg-white px-3 py-2.5 shadow-sm md:px-4 md:py-3">
       <div className="scoreboard-stats mb-2 grid grid-cols-2 gap-2 md:grid-cols-4">
-        <div className="scoreboard-card rounded-2xl bg-blue-50 px-3 py-2.5">
-          <div className="scoreboard-label text-xs font-bold uppercase tracking-wide text-blue-500">Score</div>
-          <div className="scoreboard-value mt-1 text-lg font-extrabold text-gray-700 md:text-xl">
-            {score.correct} / {score.total}
+        <div className="scoreboard-card rounded-2xl bg-orange-50 px-3 py-2.5">
+          <div className="scoreboard-label text-xs font-bold uppercase tracking-wide text-orange-600">Rescued Bears</div>
+          <div className="scoreboard-value mt-1 text-lg font-extrabold text-orange-900 md:text-xl">
+            🐻 {bearsRescued}
           </div>
         </div>
         <div className="scoreboard-card rounded-2xl bg-yellow-50 px-3 py-2.5">
