@@ -1,7 +1,6 @@
 import React from 'react';
 
 interface ScoreBoardProps {
-  score: { correct: number; total: number };
   stars: number;
   bestStreak: number;
   unlockedBadgeIds: string[];
@@ -10,7 +9,6 @@ interface ScoreBoardProps {
 }
 
 export const ScoreBoard: React.FC<ScoreBoardProps> = ({
-  score,
   stars,
   bestStreak,
   unlockedBadgeIds,

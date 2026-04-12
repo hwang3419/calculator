@@ -26,7 +26,7 @@ function App() {
   const [answerRange, setAnswerRange] = useState<number>(10);
   const [currentProblem, setCurrentProblem] = useState<MathProblem | null>(null);
   const [userAnswer, setUserAnswer] = useState<string>('');
-  const [score, setScore] = useState<{ correct: number; total: number }>({ correct: 0, total: 0 });
+
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [streak, setStreak] = useState<number>(0);
   const [isHugeCelebration, setIsHugeCelebration] = useState<boolean>(false);
@@ -233,10 +233,6 @@ function App() {
     }
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
-    setScore(prev => ({
-      correct: prev.correct + (isCorrect ? 1 : 0),
-      total: prev.total + 1
-    }));
   };
 
   const handleProblemModeChange = (newMode: ProblemMode) => {
@@ -424,7 +420,6 @@ function App() {
         {/* ScoreBoard */}
         <div className="game-scoreboard mx-auto mb-2 w-full max-w-5xl shrink-0">
           <ScoreBoard
-            score={score}
             stars={progress.stars}
             bestStreak={progress.bestStreak}
             unlockedBadgeIds={progress.unlockedBadgeIds}

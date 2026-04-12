@@ -19,7 +19,7 @@ export const BadgeUnlockEffect: React.FC<BadgeUnlockEffectProps> = ({ badges }) 
             <div key={badge.id} className="rounded-2xl bg-white/85 px-4 py-3 shadow-sm ring-2 ring-amber-200">
               <div className="text-4xl">{badge.emoji}</div>
               <div className="mt-1 text-sm font-extrabold text-amber-800">{badge.name}</div>
-              <div className="text-xs font-bold text-amber-600">Streak {badge.streakRequired}</div>
+              <div className="text-xs font-bold text-amber-600">{badge.description}</div>
             </div>
           ))}
         </div>

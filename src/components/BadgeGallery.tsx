@@ -29,7 +29,7 @@ export const BadgeGallery: React.FC<BadgeGalleryProps> = ({ unlockedBadgeIds }) 
               <div className="mb-1 text-3xl">{unlocked ? badge.emoji : '🔒'}</div>
               <div className="text-xs font-extrabold">{badge.name}</div>
               <div className="mt-1 text-[11px] font-semibold">
-                {unlocked ? `Streak ${badge.streakRequired}` : `${badge.streakRequired} in a row`}
+                {badge.description}
               </div>
             </div>
           );
