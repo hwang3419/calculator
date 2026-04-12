@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import bearRescueStages from '../assets/bear-rescue-stages.png';
+import bearRescueStages1 from '../assets/bear-rescue-stages.png';
+import bearRescueStages2 from '../assets/bear-rescue-stages-2.png';
+// import bearRescueStages3 from '../assets/bear-rescue-stages-3.png';
+
+// 将所有你想随机出现的图片放进这个数组里
+const ALL_IMAGES = [
+  bearRescueStages1,
+  bearRescueStages2,
+  // bearRescueStages3,
+];
 
 type SceneReaction = 'idle' | 'sad' | 'success';
 
@@ -28,7 +37,15 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
   const safeStage = Math.max(0, Math.min(stage, 3));
   const [displayStage, setDisplayStage] = useState(safeStage);
   const [incomingStage, setIncomingStage] = useState<number | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const progressInCurrentStage = safeStage === 3 ? answersPerStage : stageProgress;
+
+  useEffect(() => {
+    // 每次重新开始（进度重置）时，随机抽取一张图片
+    if (stage === 0 && stageProgress === 0) {
+      setCurrentImageIndex(Math.floor(Math.random() * ALL_IMAGES.length));
+    }
+  }, [stage, stageProgress]);
 
   useEffect(() => {
     if (safeStage === displayStage) return;
@@ -47,6 +64,8 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
 
   const currentImagePosition = IMAGE_POSITIONS[displayStage];
   const nextImagePosition = incomingStage !== null ? IMAGE_POSITIONS[incomingStage] : null;
+
+  const currentImageUrl = ALL_IMAGES[currentImageIndex] || ALL_IMAGES[0];
 
   return (
     <div className="bear-scene mb-2 w-full overflow-hidden rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-emerald-100 via-sky-100 to-lime-100 p-3 shadow-sm">
@@ -80,7 +99,7 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
             } ${incomingStage !== null ? 'animate-bear-stage-fade-out' : ''}`}
         >
           <img
-            src={bearRescueStages}
+            src={currentImageUrl}
             alt=""
             aria-hidden="true"
             className="pointer-events-none h-[200%] w-[200%] max-w-none select-none"
@@ -92,7 +111,7 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
         {nextImagePosition && (
           <div className="absolute inset-0 overflow-hidden animate-bear-stage-fade-in">
             <img
-              src={bearRescueStages}
+              src={currentImageUrl}
               alt=""
               aria-hidden="true"
               className="pointer-events-none h-[200%] w-[200%] max-w-none select-none"
