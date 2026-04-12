@@ -26,19 +26,19 @@ function getOperatorsForMode(mode: ProblemMode): Operator[] {
 }
 
 export function generateProblem(settings: ProblemSettings): MathProblem {
-  const maxAnswer = Math.max(0, settings.answerRange);
+  const maxAnswer = Math.max(1, settings.answerRange);
   const operators = getOperatorsForMode(settings.mode);
   const operator = operators[Math.floor(Math.random() * operators.length)];
 
   if (operator === '+') {
     const answer = Math.floor(Math.random() * (maxAnswer + 1));
-    const b = Math.max(1, Math.floor(Math.random() * (answer + 1)));
+    const b = Math.floor(Math.random() * (answer + 1));
     const a = answer - b;
     return { a, b, operator };
   }
 
   const answer = Math.floor(Math.random() * (maxAnswer + 1));
-  const b = Math.max(1, Math.floor(Math.random() * (maxAnswer - answer + 1)));
+  const b = Math.floor(Math.random() * (maxAnswer - answer + 1));
   const a = answer + b;
   return { a, b, operator };
 }
