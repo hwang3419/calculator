@@ -20,8 +20,8 @@ interface BearRescueSceneProps {
 }
 
 const STAGE_COPY = [
-  'The bear is locked in the cage. Let’s help.',
-  'Good job. The bear is still crying, but we are closer.',
+  'Let’s help.',
+  'Good job. We are closer.',
   'Almost there. One more push to rescue the bear.',
   'Success. The bear is smiling now!',
 ];

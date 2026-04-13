@@ -443,16 +443,16 @@ function App() {
 
           {/* Right Side: Problem, Input, Number Pad */}
           <div className="game-right-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
-            <ProblemDisplay problem={currentProblem} />
+            <ProblemDisplay problem={currentProblem}>
+              {!feedback && <AnswerInput value={userAnswer} />}
+            </ProblemDisplay>
 
-            {feedback ? (
+            {feedback && (
               <FeedbackBanner
                 status={feedback}
                 correctAnswer={getCorrectAnswer()}
                 onRetry={initProblem}
               />
-            ) : (
-              <AnswerInput value={userAnswer} />
             )}
 
             {!feedback ? (
