@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import bearRescueStages1 from '../assets/bear-rescue-stages.png';
 import bearRescueStages2 from '../assets/bear-rescue-stages-2.png';
+import bearRescueStages3 from '../assets/bear-rescue-stages-3.png';
+import bearRescueStages4 from '../assets/bear-rescue-stages-4.png';
+import bearRescueStages5 from '../assets/bear-rescue-stages-5.png';
 // import bearRescueStages3 from '../assets/bear-rescue-stages-3.png';
 
 // 将所有你想随机出现的图片放进这个数组里
 const ALL_IMAGES = [
   bearRescueStages1,
   bearRescueStages2,
-  // bearRescueStages3,
+  bearRescueStages3,
+  bearRescueStages4,
+  bearRescueStages5,
 ];
 
 type SceneReaction = 'idle' | 'sad' | 'success';
@@ -102,7 +107,7 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
             src={currentImageUrl}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none h-[200%] w-[200%] max-w-none select-none"
+            className="pointer-events-none h-[200%] w-[200%] max-w-none select-none object-contain"
             draggable="false"
             style={{ transform: `translate(${currentImagePosition.x}, ${currentImagePosition.y})` }}
           />
@@ -114,7 +119,7 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
               src={currentImageUrl}
               alt=""
               aria-hidden="true"
-              className="pointer-events-none h-[200%] w-[200%] max-w-none select-none"
+              className="pointer-events-none h-[200%] w-[200%] max-w-none select-none object-contain"
               draggable="false"
               style={{ transform: `translate(${nextImagePosition.x}, ${nextImagePosition.y})` }}
             />
