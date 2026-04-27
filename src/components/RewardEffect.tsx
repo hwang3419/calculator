@@ -6,9 +6,10 @@ type RewardType = typeof REWARD_TYPES[number];
 
 interface RewardEffectProps {
   isHuge?: boolean;
+  isBearRescue?: boolean;
 }
 
-export const RewardEffect: React.FC<RewardEffectProps> = ({ isHuge }) => {
+export const RewardEffect: React.FC<RewardEffectProps> = ({ isHuge, isBearRescue }) => {
   const [rewardType, setRewardType] = useState<RewardType>('stars');
   const [hugeElements, setHugeElements] = useState<{id: number, emoji: string, left: string, top: string, animation: string, delay: string, duration: string, size: string}[]>([]);
 
@@ -60,11 +61,58 @@ export const RewardEffect: React.FC<RewardEffectProps> = ({ isHuge }) => {
       });
       setHugeElements(elements);
 
+    } else if (isBearRescue) {
+      // Bear Rescue Confetti
+      const count = 200;
+      const defaults = {
+        origin: { y: 0.7 }
+      };
+
+      const fire = (particleRatio: number, opts: any) => {
+        confetti({
+          ...defaults,
+          ...opts,
+          particleCount: Math.floor(count * particleRatio)
+        });
+      };
+
+      fire(0.25, {
+        spread: 26,
+        startVelocity: 55,
+      });
+      fire(0.2, {
+        spread: 60,
+      });
+      fire(0.35, {
+        spread: 100,
+        decay: 0.91,
+        scalar: 0.8
+      });
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 25,
+        decay: 0.92,
+        scalar: 1.2
+      });
+      fire(0.1, {
+        spread: 120,
+        startVelocity: 45,
+      });
     } else {
       const randomType = REWARD_TYPES[Math.floor(Math.random() * REWARD_TYPES.length)];
       setRewardType(randomType);
     }
-  }, [isHuge]);
+  }, [isHuge, isBearRescue]);
+
+  if (isBearRescue) {
+    return (
+      <div className="fixed inset-0 pointer-events-none z-[9999] flex items-center justify-center overflow-hidden">
+        <div className="text-[15rem] md:text-[20rem] animate-bear-jump-out drop-shadow-2xl">
+          🐻
+        </div>
+      </div>
+    );
+  }
 
   if (isHuge) {
     return (

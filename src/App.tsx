@@ -11,7 +11,7 @@ import { ANSWER_RANGE_OPTIONS, type MathProblem, type ProblemMode, generateProbl
 import { getRandomEncouragingPhrase, playRandomRewardSound, initAudio, playEncouragingVoice, playHugeCelebrationSound } from './utils/audio';
 import { exportProgress, getUnlockedBadges, importProgressFile, loadProgress, saveProgress, type BadgeDefinition, type GameProgress, BADGE_DEFINITIONS } from './utils/progress';
 
-const AUTO_NEXT_DELAY_MS = 500;
+const AUTO_NEXT_DELAY_MS = 300;
 const ENCOURAGEMENT_TEXT_DURATION_MS = 2200;
 const REWARD_EFFECT_DURATION_MS = 3000;
 const BADGE_UNLOCK_EFFECT_DURATION_MS = 2800;
@@ -30,6 +30,7 @@ function App() {
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [streak, setStreak] = useState<number>(0);
   const [isHugeCelebration, setIsHugeCelebration] = useState<boolean>(false);
+  const [isBearRescueCelebration, setIsBearRescueCelebration] = useState<boolean>(false);
   const [encouragementText, setEncouragementText] = useState<string | null>(null);
   const [showRewardEffect, setShowRewardEffect] = useState<boolean>(false);
   const [rewardEffectKey, setRewardEffectKey] = useState<number>(0);
@@ -45,15 +46,19 @@ function App() {
   const [problemStartTime, setProblemStartTime] = useState<number>(Date.now());
 
   const initProblem = useCallback(() => {
-    setCurrentProblem(generateProblem({ mode: problemMode, answerRange }));
+    setCurrentProblem(generateProblem({ mode: problemMode, answerRange }, progress.wrongProblems));
     setUserAnswer('');
     setFeedback(null);
     setProblemStartTime(Date.now());
-  }, [answerRange, problemMode]);
+  }, [answerRange, problemMode, progress.wrongProblems]);
 
   useEffect(() => {
     initProblem();
-  }, [initProblem]);
+    // Only re-initialize when the user explicitly changes the mode or range.
+    // We don't want to re-initialize every time progress (like wrongProblems) changes,
+    // as that would skip the "Correct" feedback instantly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answerRange, problemMode]);
 
   useEffect(() => {
     if (feedback !== 'correct') return;
@@ -85,6 +90,7 @@ function App() {
 
     const timer = window.setTimeout(() => {
       setShowRewardEffect(false);
+      setIsBearRescueCelebration(false);
     }, REWARD_EFFECT_DURATION_MS);
 
     return () => {
@@ -170,12 +176,12 @@ function App() {
     if (isCorrect) {
       const newStreak = streak + 1;
       const shouldShowHugeCelebration = newStreak > 0 && newStreak % 10 === 0;
-      
+
       const nextBearStageProgress = bearStageProgress + 1;
       const shouldAdvanceBearStage = nextBearStageProgress >= CORRECT_ANSWERS_PER_BEAR_STAGE;
       const nextBearStage = shouldAdvanceBearStage ? Math.min(bearRescueStage + 1, 3) : bearRescueStage;
       const didRescueBear = nextBearStage === 3;
-      
+
       setStreak(newStreak);
       setBearStageProgress(shouldAdvanceBearStage ? 0 : nextBearStageProgress);
       if (shouldAdvanceBearStage) {
@@ -204,15 +210,21 @@ function App() {
         setBadgeEffectKey((prev) => prev + 1);
       }
 
+      const nextMistakes = progress.wrongProblems.filter(p =>
+        !(p.a === currentProblem.a && p.b === currentProblem.b && p.operator === currentProblem.operator)
+      );
+
       setProgress({
         ...nextProgress,
         unlockedBadgeIds: Array.from(new Set([...progress.unlockedBadgeIds, ...unlockedBadges.map(b => b.id)])),
+        wrongProblems: nextMistakes,
       });
 
       if (didRescueBear) {
         const phrase = getRandomEncouragingPhrase();
         setEncouragementText(phrase);
         setIsHugeCelebration(shouldShowHugeCelebration);
+        setIsBearRescueCelebration(true);
         setShowRewardEffect(true);
         setRewardEffectKey((prev) => prev + 1);
         setPauseForNext(true);
@@ -230,6 +242,17 @@ function App() {
       setEncouragementText(null);
       setShowRewardEffect(false);
       setBearReaction('sad');
+
+      // Add to mistakes if not already there
+      const isAlreadyInMistakes = progress.wrongProblems.some(p =>
+        p.a === currentProblem.a && p.b === currentProblem.b && p.operator === currentProblem.operator
+      );
+      if (!isAlreadyInMistakes) {
+        setProgress(prev => ({
+          ...prev,
+          wrongProblems: [...prev.wrongProblems, currentProblem]
+        }));
+      }
     }
 
     setFeedback(isCorrect ? 'correct' : 'incorrect');
@@ -271,7 +294,7 @@ function App() {
     <div className="game-shell h-[100dvh] bg-[#f0fdf4] font-sans overflow-hidden px-3 py-2 selection:bg-transparent md:px-4 md:py-3">
       {showBadges && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm" onClick={() => setShowBadges(false)}>
-          <div 
+          <div
             className="w-full max-w-2xl flex-col rounded-[2rem] border-4 border-yellow-200 bg-gradient-to-b from-amber-50 to-orange-50 p-4 shadow-[0_20px_50px_rgba(217,119,6,0.3)] md:p-6"
             onClick={e => e.stopPropagation()}
           >
@@ -296,13 +319,12 @@ function App() {
                 {BADGE_DEFINITIONS.map(badge => {
                   const unlocked = progress.unlockedBadgeIds.includes(badge.id);
                   return (
-                    <div 
-                      key={badge.id} 
-                      className={`flex aspect-square flex-col items-center justify-center rounded-[1.5rem] border-2 p-2 text-center shadow-sm transition-all ${
-                        unlocked 
-                          ? 'border-yellow-300 bg-white shadow-amber-200/50' 
-                          : 'border-dashed border-amber-200/60 bg-amber-100/30'
-                      }`}
+                    <div
+                      key={badge.id}
+                      className={`flex aspect-square flex-col items-center justify-center rounded-[1.5rem] border-2 p-2 text-center shadow-sm transition-all ${unlocked
+                        ? 'border-yellow-300 bg-white shadow-amber-200/50'
+                        : 'border-dashed border-amber-200/60 bg-amber-100/30'
+                        }`}
                     >
                       <div className={`mb-2 text-4xl md:text-5xl ${!unlocked && 'opacity-60 grayscale'}`}>
                         {unlocked ? badge.emoji : '🔒'}
@@ -321,7 +343,7 @@ function App() {
           </div>
         </div>
       )}
-      {showRewardEffect && <RewardEffect key={rewardEffectKey} isHuge={isHugeCelebration} />}
+      {showRewardEffect && <RewardEffect key={rewardEffectKey} isHuge={isHugeCelebration} isBearRescue={isBearRescueCelebration} />}
       {newlyUnlockedBadges.length > 0 && <BadgeUnlockEffect key={badgeEffectKey} badges={newlyUnlockedBadges} />}
       {encouragementText && (
         <div className="pointer-events-none absolute inset-x-0 top-18 z-[110] flex justify-center px-4 md:top-20">
@@ -362,9 +384,10 @@ function App() {
                   onChange={(e) => handleProblemModeChange(e.target.value as ProblemMode)}
                   className="cursor-pointer appearance-none rounded-xl border-2 border-transparent bg-gray-100 px-3 py-2 text-sm font-extrabold text-gray-800 outline-none transition-colors focus:border-blue-400 focus:bg-white"
                 >
-                  <option value="plus">Plus</option>
-                  <option value="minus">Minus</option>
-                  <option value="both">Both</option>
+                  <option value="plus">Plus (+)</option>
+                  <option value="minus">Minus (-)</option>
+                  <option value="both">Mixed (+ & -)</option>
+                  <option value="mistakes">Mistakes (错题集: {progress.wrongProblems.length})</option>
                 </select>
               </div>
 

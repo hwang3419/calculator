@@ -1,3 +1,5 @@
+import type { MathProblem } from './mathLogic';
+
 export interface BadgeDefinition {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export interface GameProgress {
   subtractionCorrect: number;
   fastAnswers: number;
   totalAnswers: number;
+  wrongProblems: MathProblem[];
 }
 
 interface ExportedProgressFile {
@@ -92,6 +95,7 @@ const DEFAULT_PROGRESS: GameProgress = {
   subtractionCorrect: 0,
   fastAnswers: 0,
   totalAnswers: 0,
+  wrongProblems: [],
 };
 
 export function loadProgress(): GameProgress {
@@ -128,6 +132,7 @@ export function normalizeProgress(progress: Partial<GameProgress>): GameProgress
     subtractionCorrect: Number.isFinite(progress.subtractionCorrect) ? Math.max(0, progress.subtractionCorrect as number) : 0,
     fastAnswers: Number.isFinite(progress.fastAnswers) ? Math.max(0, progress.fastAnswers as number) : 0,
     totalAnswers: Number.isFinite(progress.totalAnswers) ? Math.max(0, progress.totalAnswers as number) : 0,
+    wrongProblems: Array.isArray(progress.wrongProblems) ? progress.wrongProblems : [],
   };
 }
 

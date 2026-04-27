@@ -33,7 +33,7 @@ export const NumberPad: React.FC<NumberPadProps> = ({ onNumberClick, onClear, on
               else if (btn === '✓') onSubmit();
               else onNumberClick(btn);
             }}
-            className={`numberpad-button ${bgColor} flex h-16 select-none items-center justify-center rounded-2xl text-3xl font-extrabold transition-all md:h-20 md:text-4xl ${disabled ? 'pointer-events-none translate-y-1 cursor-not-allowed border-b-0 opacity-50' : 'cursor-pointer'}`}
+            className={`numberpad-button ${bgColor} flex aspect-square w-full select-none items-center justify-center rounded-2xl text-4xl font-extrabold transition-all md:text-5xl ${disabled ? 'pointer-events-none translate-y-1 cursor-not-allowed border-b-0 opacity-50' : 'cursor-pointer'}`}
           >
             {btn}
           </button>

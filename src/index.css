@@ -138,6 +138,19 @@ html, body, #root {
   100% { opacity: 0; transform: scale(0.98); filter: brightness(0.95); }
 }
 
+@keyframes bear-jump-out {
+  0% { transform: scale(0.5) translateY(100vh); opacity: 0; }
+  25% { transform: scale(1.2) translateY(-10vh); opacity: 1; }
+  50% { transform: scale(1.5) translateY(-20vh) rotate(15deg); opacity: 1; }
+  100% { transform: scale(3) translateY(-120vh) rotate(-15deg); opacity: 0; }
+}
+
+.animate-bear-jump-out {
+  animation: bear-jump-out 2.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
 .animate-bear-stage-fade-in {
   animation: bear-stage-fade-in 0.42s ease-out forwards;
 }
@@ -265,8 +278,7 @@ html, body, #root {
   }
 
   .numberpad-button {
-    height: 3rem;
-    font-size: 1.55rem;
+    font-size: 2rem;
   }
 
   .game-frame > .absolute.right-0.top-0 > button {
@@ -312,8 +324,7 @@ html, body, #root {
   }
 
   .numberpad-button {
-    height: 2.45rem;
-    font-size: 1.25rem;
+    font-size: 1.8rem;
   }
 
   .game-frame > .absolute.right-0.top-0 > button {
