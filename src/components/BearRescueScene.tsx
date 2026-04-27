@@ -73,8 +73,8 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
   const currentImageUrl = ALL_IMAGES[currentImageIndex] || ALL_IMAGES[0];
 
   return (
-    <div className="bear-scene mb-2 w-full overflow-hidden rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-emerald-100 via-sky-100 to-lime-100 p-3 shadow-sm">
-      <div className="mb-2 flex items-center justify-between gap-3">
+    <div className="bear-scene mb-1 w-full overflow-hidden rounded-[1.5rem] md:rounded-[1.75rem] border-4 border-white bg-gradient-to-br from-emerald-100 via-sky-100 to-lime-100 p-2 md:p-3 shadow-sm">
+      <div className="bear-scene-header mb-1 flex items-center justify-between gap-3">
         <div>
           <div className="text-xs font-black uppercase tracking-[0.22em] text-green-700">Rescue The Bear</div>
           <div className="mt-1 text-xs font-extrabold text-green-900 md:text-sm">{STAGE_COPY[safeStage]}</div>
@@ -89,7 +89,7 @@ export const BearRescueScene: React.FC<BearRescueSceneProps> = ({ stage, reactio
         </div>
       </div>
 
-      <div className="mb-3 h-2.5 overflow-hidden rounded-full bg-white/70">
+      <div className="bear-scene-progress mb-2 h-2 overflow-hidden rounded-full bg-white/70">
         <div
           className="h-full rounded-full bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 transition-all duration-700"
           style={{ width: `${(((safeStage * answersPerStage) + progressInCurrentStage) / (4 * answersPerStage)) * 100}%` }}

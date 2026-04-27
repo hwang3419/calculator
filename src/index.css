@@ -249,6 +249,14 @@ html, body, #root {
   .bear-scene-image {
     border-width: 2px;
   }
+  
+  .bear-scene-header {
+    display: none;
+  }
+  
+  .bear-scene-progress {
+    display: none;
+  }
 
   .problem-card {
     min-height: 72px;
