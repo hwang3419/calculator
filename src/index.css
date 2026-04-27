@@ -6,8 +6,9 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
   overscroll-behavior: none;
-  background-color: #f0fdf4; /* Default light green matching kids theme app */
+  background-color: #f0fdf4;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -246,7 +247,7 @@ html, body, #root {
   }
 
   .bear-scene-image {
-    border-width: 3px;
+    border-width: 2px;
   }
 
   .problem-card {
@@ -274,11 +275,14 @@ html, body, #root {
   }
 
   .numberpad {
-    gap: 0.45rem;
+    gap: 0.35rem;
   }
 
   .numberpad-button {
-    font-size: 2rem;
+    height: 3.5rem;
+    aspect-ratio: auto;
+    font-size: 1.8rem;
+    border-radius: 1rem;
   }
 
   .game-frame > .absolute.right-0.top-0 > button {
@@ -324,7 +328,10 @@ html, body, #root {
   }
 
   .numberpad-button {
-    font-size: 1.8rem;
+    height: 2.8rem;
+    aspect-ratio: auto;
+    font-size: 1.5rem;
+    border-radius: 0.75rem;
   }
 
   .game-frame > .absolute.right-0.top-0 > button {

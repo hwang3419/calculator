@@ -452,10 +452,10 @@ function App() {
         </div>
 
         {/* Main Content Area */}
-        <div className="game-main grid min-h-0 flex-1 gap-3 md:grid-cols-[minmax(0,1fr)_minmax(320px,0.95fr)]">
+        <div className="game-main grid min-h-0 flex-1 gap-2 md:gap-3 md:grid-cols-[minmax(0,1fr)_minmax(320px,0.95fr)]">
 
           {/* Left Side: Bear Scene */}
-          <div className="game-left-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-white/55 p-2 shadow-sm ring-1 ring-white/70 md:p-3">
+          <div className="game-left-panel flex min-h-0 w-full flex-col justify-start rounded-[1.5rem] md:rounded-[2rem] bg-white/55 p-2 shadow-sm ring-1 ring-white/70 md:p-3">
             <BearRescueScene
               stage={bearRescueStage}
               reaction={bearReaction}
@@ -465,7 +465,7 @@ function App() {
           </div>
 
           {/* Right Side: Problem, Input, Number Pad */}
-          <div className="game-right-panel flex min-h-0 w-full flex-col justify-center rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-3 shadow-sm ring-1 ring-white/80">
+          <div className="game-right-panel flex min-h-0 w-full flex-col justify-start rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-white via-sky-50 to-emerald-50 p-2 md:p-3 shadow-sm ring-1 ring-white/80">
             <ProblemDisplay problem={currentProblem}>
               {!feedback && <AnswerInput value={userAnswer} />}
             </ProblemDisplay>
